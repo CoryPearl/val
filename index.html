@@ -141,7 +141,11 @@
             background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
             color: #666;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            position: absolute;
+            transition: all 0.3s ease;
+        }
+        
+        .no-btn:hover {
+            transform: scale(0.9);
         }
 
         .celebration {
@@ -245,58 +249,48 @@
 
         setInterval(createHeart, 300);
 
-        // Make the "No" button run away
+        // Make the "No" button shrink and plead
         let noClickCount = 0;
         function moveButton() {
             const button = document.getElementById('noBtn');
-            const container = document.getElementById('buttonsContainer');
             const yesBtn = document.querySelector('.yes-btn');
             
             noClickCount++;
             
-            // Change button text based on attempts
-            const texts = ['No', 'Are you sure?', 'Really?', 'Please? 🥺', 'Just think about it!', 'Pretty please? 💕'];
+            // Change button text and size based on attempts
+            const texts = [
+                'No', 
+                'Are you sure? 🥺', 
+                'Really sure? 😢', 
+                'But why? 💔', 
+                'Please reconsider! 😭',
+                'I\'m fading away... 👻',
+                'Almost gone... 💨'
+            ];
+            
             if (noClickCount < texts.length) {
                 button.textContent = texts[noClickCount];
             }
             
-            // Get Yes button position and dimensions
-            const yesRect = yesBtn.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
+            // Shrink the No button
+            const newScale = Math.max(0.3, 1 - (noClickCount * 0.15));
+            button.style.transform = `scale(${newScale})`;
+            button.style.opacity = Math.max(0.3, 1 - (noClickCount * 0.12));
             
-            // Calculate Yes button position relative to container
-            const yesLeft = yesRect.left - containerRect.left;
-            const yesTop = yesRect.top - containerRect.top;
-            const yesRight = yesLeft + yesRect.width;
-            const yesBottom = yesTop + yesRect.height;
+            // Make it harder to click as it shrinks
+            if (noClickCount >= 5) {
+                button.style.pointerEvents = 'none';
+                button.style.opacity = '0.2';
+                setTimeout(() => {
+                    button.style.display = 'none';
+                }, 500);
+            }
             
-            // Move button to random position that doesn't overlap with Yes button
-            const maxX = container.clientWidth - button.offsetWidth;
-            const maxY = container.clientHeight - button.offsetHeight;
-            
-            let randomX, randomY;
-            let attempts = 0;
-            
-            // Keep trying until we find a position that doesn't overlap
-            do {
-                randomX = Math.random() * maxX;
-                randomY = Math.random() * maxY;
-                attempts++;
-            } while (
-                attempts < 100 && // Prevent infinite loop
-                randomX < yesRight + 10 && 
-                randomX + button.offsetWidth > yesLeft - 10 &&
-                randomY < yesBottom + 10 && 
-                randomY + button.offsetHeight > yesTop - 10
-            );
-            
-            button.style.left = randomX + 'px';
-            button.style.top = randomY + 'px';
-            
-            // Make Yes button bigger each time No is avoided
+            // Make Yes button bigger and more enticing
             const currentSize = parseFloat(getComputedStyle(yesBtn).fontSize);
-            yesBtn.style.fontSize = (currentSize + 2) + 'px';
-            yesBtn.style.padding = (15 + noClickCount * 2) + 'px ' + (30 + noClickCount * 3) + 'px';
+            yesBtn.style.fontSize = (currentSize + 3) + 'px';
+            yesBtn.style.padding = (15 + noClickCount * 3) + 'px ' + (30 + noClickCount * 4) + 'px';
+            yesBtn.style.transform = `scale(${1 + noClickCount * 0.1})`;
         }
 
         // Celebrate when Yes is clicked
