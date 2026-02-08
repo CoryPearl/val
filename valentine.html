@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 Be My Valentine? 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hearts-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            animation: float 6s infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #ff1493;
+            font-size: 32px;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .emoji {
+            font-size: 80px;
+            margin: 20px 0;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .question {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            min-height: 120px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .yes-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+        }
+
+        .no-btn {
+            background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
+            color: #666;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: absolute;
+        }
+
+        .celebration {
+            display: none;
+        }
+
+        .celebration.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .celebration h2 {
+            color: #ff1493;
+            font-size: 36px;
+            margin: 20px 0;
+        }
+
+        .celebration p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .celebration-emoji {
+            font-size: 100px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff1493;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-bg" id="heartsContainer"></div>
+    
+    <div class="container">
+        <div id="question-container">
+            <h1>💝 Valentine's Day 💝</h1>
+            <div class="emoji">😍</div>
+            <p class="question">Will you be my Valentine?</p>
+            <div class="buttons" id="buttonsContainer">
+                <button class="yes-btn" onclick="sayYes()">Yes! 💕</button>
+                <button class="no-btn" id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No</button>
+            </div>
+        </div>
+
+        <div class="celebration" id="celebration">
+            <div class="celebration-emoji">💖</div>
+            <h2>Yay! 🎉</h2>
+            <p>I'm so happy! This is going to be the best Valentine's Day ever! 💑</p>
+            <div style="margin-top: 20px; font-size: 40px;">
+                😊💕✨🌹💐🎊
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating hearts background
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '💕';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            document.getElementById('heartsContainer').appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 6000);
+        }
+
+        setInterval(createHeart, 300);
+
+        // Make the "No" button run away
+        let noClickCount = 0;
+        function moveButton() {
+            const button = document.getElementById('noBtn');
+            const container = document.getElementById('buttonsContainer');
+            const yesBtn = document.querySelector('.yes-btn');
+            
+            noClickCount++;
+            
+            // Change button text based on attempts
+            const texts = ['No', 'Are you sure?', 'Really?', 'Please? 🥺', 'Just think about it!', 'Pretty please? 💕'];
+            if (noClickCount < texts.length) {
+                button.textContent = texts[noClickCount];
+            }
+            
+            // Get Yes button position and dimensions
+            const yesRect = yesBtn.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calculate Yes button position relative to container
+            const yesLeft = yesRect.left - containerRect.left;
+            const yesTop = yesRect.top - containerRect.top;
+            const yesRight = yesLeft + yesRect.width;
+            const yesBottom = yesTop + yesRect.height;
+            
+            // Move button to random position that doesn't overlap with Yes button
+            const maxX = container.clientWidth - button.offsetWidth;
+            const maxY = container.clientHeight - button.offsetHeight;
+            
+            let randomX, randomY;
+            let attempts = 0;
+            
+            // Keep trying until we find a position that doesn't overlap
+            do {
+                randomX = Math.random() * maxX;
+                randomY = Math.random() * maxY;
+                attempts++;
+            } while (
+                attempts < 100 && // Prevent infinite loop
+                randomX < yesRight + 10 && 
+                randomX + button.offsetWidth > yesLeft - 10 &&
+                randomY < yesBottom + 10 && 
+                randomY + button.offsetHeight > yesTop - 10
+            );
+            
+            button.style.left = randomX + 'px';
+            button.style.top = randomY + 'px';
+            
+            // Make Yes button bigger each time No is avoided
+            const currentSize = parseFloat(getComputedStyle(yesBtn).fontSize);
+            yesBtn.style.fontSize = (currentSize + 2) + 'px';
+            yesBtn.style.padding = (15 + noClickCount * 2) + 'px ' + (30 + noClickCount * 3) + 'px';
+        }
+
+        // Celebrate when Yes is clicked
+        function sayYes() {
+            document.getElementById('question-container').style.display = 'none';
+            document.getElementById('celebration').classList.add('active');
+            
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#ff1493', '#ff69b4', '#ff85c1', '#ffc0cb'][Math.floor(Math.random() * 4)];
+                    confetti.style.animationDelay = Math.random() + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>
